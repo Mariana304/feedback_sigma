@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FeedbackController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,12 +16,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return to_route('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [FeedbackController::class, 'show'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -29,3 +28,20 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::get('/Consulta', [FeedbackController::class, 'show'])->name('feedback.show');
+
+Route::get('/gracias', function(){
+return view('gracias');
+})->name('feedback.gracias');
+
+Route::post('/feedback',[FeedbackController::class, 'store'])->name('feedback.store');
+Route::get('/feedback/{token}', [FeedbackController::class, 'index'])->name('feedback.index');
+
+Route::get('/{token}', function ($token) {
+   
+         $token = Crypt::encryptString($token);
+    return to_route('feedback.index', [
+        'token' =>  $token]);
+ 
+});
